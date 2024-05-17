@@ -1,0 +1,87 @@
+Coding Challenges: CareerHub, The Job Board
+Name: Lavanya Mala A
+Batch no: 6
+Assignment pdf no. :  2
+1.Provide a SQL script that initializes the database for the Job Board scenario “CareerHub”.
+Create database careerhub;
+ 
+
+2. Create tables for Companies, Jobs, Applicants and Applications.
+create table companies(CompanyID int primary key,CompanyName varchar(50),Location varchar(50));
+create table Jobs(JobID int primary key,CompanyID int,JobTitle varchar(50),JobDescription text,JobLocation varchar(50),Salary decimal(10,2),JobType varchar(50),Posteddate datetime,foreign key(CompanyID) references Companies(CompanyID));
+create table applicants(ApplicantID int primary key,FirstName varchar(50),LastName varchar(50),Email varchar(50),Phone int,Resume text);
+create table applications(ApplicationID int primary key,JobID int,ApplicantID int,Applicationdate datetime,coverletter text,foreign key(JobID) references Jobs(JobID),foreign key(ApplicantID) references applicants(ApplicantID));
+ 
+
+3. Define appropriate primary keys, foreign keys, and constraints.
+Desc companies;
+Desc jobs;
+Desc Applicants;
+Desc Applications;
+ 
+ 
+
+4. Ensure the script handles potential errors, such as if the database or tables already exist.
+DROP TABLE IF EXISTS Applications, Jobs, Applicants, Companies;
+ 
+5. Write an SQL query to count the number of applications received for each job listing in the "Jobs" table. Display the job title and the corresponding application count. Ensure that it lists all jobs, even if they have no applications.
+select count(a.applicantID),j.jobID,j.jobtitle from jobs j left join applications a on a.JobID = j.jobID group by jobid,jobtitle;
+ 
+6. Develop an SQL query that retrieves job listings from the "Jobs" table within a specified salary range. Allow parameters for the minimum and maximum salary values. Display the job title,company name, location, and salary for each matching job.
+Select j.jobtitle,  c.companyname, j.joblocation,  j.salary from jobs j join companies c on j.companyid = c.companyid where  j.salary between 40000 and 100000;  
+ 
+
+7. Write an SQL query that retrieves the job application history for a specific applicant. Allow a parameter for the ApplicantID, and return a result set with the job titles, company names, and application dates for all the jobs the applicant has applied to.
+select j.jobtitle,c.companyname,a.applicationdate from applications a inner join jobs j on a.JobID =j.jobID inner join companies c on j.companyID = c.companyID where a.applicantID = 401;
+ 
+8. Create an SQL query that calculates and displays the average salary offered by all companies for job listings in the "Jobs" table. Ensure that the query filters out jobs with a salary of zero.
+select avg(j.salary),c.companyname from jobs j inner join companies c on c.companyID = j.companyID group by companyname;
+ 
+9. Write an SQL query to identify the company that has posted the most job listings. Display the company name along with the count of job listings they have posted. Handle ties if multiple companies have the same maximum count.
+select c.companyname, count(j.jobid) from companies c join jobs j on c.companyid = j.companyid group by c.companyname having count(j.jobid) = ( select max(jobcount) from ( select count(jobid) as jobcount from jobs group by companyid) as jobcounts);
+ 
+
+10. Find the applicants who have applied for positions in companies located in 'CityX' and have at least 3 years of experience.
+select a.firstname,  a.lastname, a.email,j.jobtitle, c.companynamefrom applicants ajoin 
+ applications ap on a.applicantid = ap.applicantid join  jobs j on ap.jobid = j.jobid join companies c on j.companyid = c.companyid where c.location = “san francisco”  and a.yoe >= 3 
+11. Retrieve a list of distinct job titles with salaries between $60,000 and $80,000.
+select distinct(JobTitle) from jobs where salary between 60000 and 80000;
+ 
+12. Find the jobs that have not received any applications.
+select j.jobid, j.jobtitle,j.companyid, j.joblocation, j.salary from  jobs j left join  applications a on j.jobid = a.jobid where a.applicationid is null;
+ 
+13. Retrieve a list of job applicants along with the companies they have applied to and the positions they have applied for.
+select a.firstname, a.lastname,a.email,c.companyname, j.jobtitle
+from applicants a join  applications ap on a.applicantid = ap.applicantid
+join jobs j on ap.jobid = j.jobid join companies c on j.companyid = c.companyid;
+ 
+14. Retrieve a list of companies along with the count of jobs they have posted, even if they have not received any applications.
+SELECT c.CompanyName, COUNT(j.JobID) FROM  Companies c LEFT JOIN Jobs j ON c.CompanyID = j.CompanyID GROUP BY c.CompanyName;
+ 
+
+15. List all applicants along with the companies and positions they have applied for, including those who have not applied.
+select a.applicantID,a.firstname,c.companyname,j.jobtitle from applicants a left join
+applications ap on ap.applicantid = a.applicantid left join jobs j on ap.jobID = j.jobID left join companies c on c.companyID = j.companyID;
+ 
+16. Find companies that have posted jobs with a salary higher than the average salary of all jobs.
+select c.companyname from companies c join jobs j on c.companyID =j.companyID where j.salary >
+ (select avg(salary) from jobs);
+ 
+
+17. Display a list of applicants with their names and a concatenated string of their city and state.
+
+SELECT FirstName, LastName, CONCAT(City, ', ', State) AS Location FROM Applicants;
+ 
+18. Retrieve a list of jobs with titles containing either 'Developer' or 'Engineer'.
+select jobtitle from jobs where jobtitle like "%Developer%" or jobtitle like "%Engineer%";
+ 
+19. Retrieve a list of applicants and the jobs they have applied for, including those who have not applied and jobs without applicants.
+select a.firstname, a.lastname, j.jobtitle, ap.applicationid from
+applicants a cross join jobs j left join applications ap on a.applicantid = ap.applicantid and j.jobid = ap.jobid;
+ 
+20. List all combinations of applicants and companies where the company is in a specific city and the applicant has more than 2 years of experience. For example: city=Chennai1.
+
+select a.firstname, a.lastname, c.companyname,  j.jobtitle from applicants a join  applications ap on a.applicantid = ap.applicantid  join  jobs j on ap.jobid = j.jobid  join companies c on j.companyid = c.companyid   where  c.location = 'austin' and a.yoe> 2;
+
+ 
+
